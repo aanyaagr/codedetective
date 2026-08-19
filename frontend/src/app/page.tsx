@@ -1,11 +1,13 @@
 import React from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { HeroSection } from "@/components/hero/HeroSection";
+import HeroSection  from "@/components/hero/HeroSection";
+import CaseBoard  from "@/components/hero/CaseBoard";
 import { EvidenceTrail } from "@/components/sections/EvidenceTrail";
 import { GameplayLoop } from "@/components/sections/GameplayLoop";
 import { CodeLabSection } from "@/components/sections/CodeLabSection";
 import { CtaBanner } from "@/components/sections/CtaBanner";
+
 
 export default function Home() {
   return (
@@ -17,6 +19,8 @@ export default function Home() {
       <main className="flex-grow flex flex-col">
         {/* 2. Asymmetrical Investigation Board Hero */}
         <HeroSection />
+
+        <CaseBoard />
 
         {/* 3. Investigation Deduction Trail (CASE -> CLUE -> EVIDENCE -> CODE -> SOLUTION) */}
         <EvidenceTrail />

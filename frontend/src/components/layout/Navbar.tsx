@@ -20,7 +20,9 @@ export const Navbar: React.FC = () => {
             BUREAU OF CODE INVESTIGATION
           </span>
           <span className="text-slate-600">|</span>
-          <span className="text-amber-300">ACTIVE DOSSIER: #001</span>
+          <span className="text-[#B8BDC7]">
+  CASE FILE: <span className="text-[#F5F2ED] font-bold">#001</span>
+</span>
         </div>
         <div className="hidden sm:flex items-center gap-4 text-[10px] text-slate-400 flex-shrink-0">
           <span className="text-slate-300">STATUS: INVESTIGATION IN PROGRESS</span>
@@ -34,17 +36,17 @@ export const Navbar: React.FC = () => {
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative flex items-center justify-center p-1 rounded-lg transition-transform group-hover:scale-105">
-            <DetectiveLogoIcon className="w-9 h-9 sm:w-10 sm:h-10 text-amber-500 drop-shadow-[0_0_12px_rgba(220,38,38,0.5)]" />
+            <DetectiveLogoIcon className="w-9 h-9 sm:w-10 sm:h-10 text-[#F5F2ED] drop-shadow-[0_0_10px_rgba(237,17,24,0.35)]" />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5 leading-none">
-              <span className="text-base sm:text-lg font-black tracking-wider text-amber-400 font-sans">
-                CODEDETECTIVE
-              </span>
+              <span className="text-base sm:text-lg font-black tracking-wider text-[#F5F2ED] font-sans">
+  CODE<span className="text-[#ED1118]">DETECTIVE</span>
+</span>
             </div>
-            <span className="text-[9px] tracking-[0.35em] font-black text-red-500/90 font-mono mt-0.5">
-              ACADEMY // CRIME LAB
-            </span>
+            <span className="text-[9px] tracking-[0.32em] font-black text-[#A8ADB7] font-mono mt-0.5">
+  ACADEMY // CRIME LAB
+</span>
           </div>
         </Link>
 
@@ -63,7 +65,7 @@ export const Navbar: React.FC = () => {
 
         {/* Primary Header Action */}
         <div className="hidden sm:flex items-center gap-3">
-          <a href="#get-started">
+          <a href="/case-board">
             <Button
               variant="primary"
               size="sm"
@@ -100,7 +102,7 @@ export const Navbar: React.FC = () => {
             ))}
           </div>
           <div className="pt-3 border-t border-red-900/30 flex flex-col gap-2">
-            <a href="#get-started" onClick={() => setMobileMenuOpen(false)}>
+            <a href="/case-board" onClick={() => setMobileMenuOpen(false)}>
               <Button
                 variant="primary"
                 size="sm"

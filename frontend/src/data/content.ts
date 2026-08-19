@@ -64,11 +64,15 @@ export interface AiDossier {
   stamp: string;
 }
 
-export const NAV_LINKS: NavLink[] = [
-  { label: "Case Board", href: "#case-board" },
-  { label: "Evidence Trail", href: "#evidence-trail" },
-  { label: "Gameplay Loop", href: "#gameplay-loop" },
-  { label: "Live Code Lab", href: "#code-lab" },
+export const NAV_LINKS = [
+  {
+    label: "CASE BOARD",
+    href: "/case-board",
+  },
+  {
+    label: "EVIDENCE TRAIL",
+    href: "/evidence",
+  },
 ];
 
 export const HERO_CASE_FILE = {
