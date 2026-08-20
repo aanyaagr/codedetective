@@ -17,20 +17,8 @@ export type Resolution = { rootCause: string; fixSummary: string; beforeCode: st
 export type ChallengeTest = { id: string; name: string; stdin?: string; hidden?: boolean };
 export type Challenge = { id: string; language: string; starterCode: string; hint: string; tests: ChallengeTest[] };
 export type CaseSummary = {
-  id: string;
-  number: string;
-  title: string;
-  description: string;
-  objective: string;
-  difficulty: string;
-  xpReward: number;
-  prerequisiteCaseId: string | null;
-  stages: string[];
-  concept: string;
-  locked: boolean;
-  lesson: Lesson;
-  challenge: Challenge;
-  resolution: Resolution;
+  id: string; number: string; title: string; description: string; objective: string; difficulty: string; xpReward: number;
+  prerequisiteCaseId: string | null; stages: string[]; concept: string; locked: boolean; lesson: Lesson; challenge: Challenge; resolution: Resolution;
 };
 export type Evidence = { id: string; code: string; text: string };
 export type RunTest = { id: string; name: string; passed: boolean; hidden?: boolean };
@@ -43,7 +31,22 @@ export const getCases = () => apiFetch<{ cases: CaseSummary[] }>("/cases");
 export const getCase = (id: string) => apiFetch<{ case: CaseSummary; progress: CaseProgress | null; evidence: Evidence[] }>(`/cases/${id}`);
 export const getCaseProgress = (id: string) => apiFetch<{ locked: boolean; progress: CaseProgress | null; discoveredEvidence: Array<{ caseId: string; evidenceId: string; discoveredAt: string }>; latestSubmission: Submission | null }>(`/cases/${id}/progress`);
 export const getProgress = () => apiFetch<Progress>("/progress");
-export const startCase = (id: string) => apiFetch<{ progress: CaseProgress }>(`/cases/${id}/start`, { method: "POST" });
+
+export async function getActiveCase() {
+  const storedId = typeof window !== "undefined" ? localStorage.getItem("codedetective_active_case") : null;
+  const cases = await getCases();
+  const selected = cases.cases.find((item) => item.id === storedId && !item.locked) || cases.cases.find((item) => !item.locked);
+  if (!selected) throw new Error("No unlocked investigation is available.");
+  if (typeof window !== "undefined") localStorage.setItem("codedetective_active_case", selected.id);
+  return getCase(selected.id);
+}
+
+export async function startCase(id: string) {
+  const result = await apiFetch<{ progress: CaseProgress }>(`/cases/${id}/start`, { method: "POST" });
+  if (typeof window !== "undefined") localStorage.setItem("codedetective_active_case", id);
+  return result;
+}
+
 export const updateStage = (id: string, stage: string) => apiFetch<{ progress: CaseProgress }>(`/cases/${id}/stage`, { method: "POST", body: JSON.stringify({ stage }) });
 export const completeLesson = (id: string) => apiFetch<{ completed: boolean; progress: CaseProgress }>(`/cases/${id}/lesson/complete`, { method: "POST" });
 export const discoverEvidence = (id: string, evidenceId: string) => apiFetch<{ evidence: Evidence }>(`/cases/${id}/evidence/${evidenceId}/discover`, { method: "POST" });
