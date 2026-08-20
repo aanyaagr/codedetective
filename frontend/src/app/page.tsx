@@ -2,7 +2,7 @@ import React from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import HeroSection from "@/components/hero/HeroSection";
-import CaseBoard from "@/components/hero/CaseBoard";
+import LiveCaseBoard from "@/components/hero/LiveCaseBoard";
 import { EvidenceTrail } from "@/components/sections/EvidenceTrail";
 import { GameplayLoop } from "@/components/sections/GameplayLoop";
 import { LiveCodeLabSection } from "@/components/sections/LiveCodeLabSection";
@@ -14,7 +14,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-grow flex flex-col">
         <HeroSection />
-        <CaseBoard />
+        <LiveCaseBoard />
         <EvidenceTrail />
         <GameplayLoop />
         <LiveCodeLabSection />
