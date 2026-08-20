@@ -4,5 +4,5 @@ const initialData={users:[],sessions:[],seasons:[{id:"season-1",number:1,title:"
 function initializeStore(){fs.mkdirSync(DATA_DIR,{recursive:true});if(!fs.existsSync(DATA_FILE))write(initialData);}
 function read(){initializeStore();return JSON.parse(fs.readFileSync(DATA_FILE,"utf8"));}
 function write(data){fs.mkdirSync(DATA_DIR,{recursive:true});const tmp=`${DATA_FILE}.tmp`;fs.writeFileSync(tmp,JSON.stringify(data,null,2));fs.renameSync(tmp,DATA_FILE);}
-function update(mutator){const data=read();const result=mutator(data)||data;write(data);return result;}
+function update(mutator){const data=read();const result=mutator(data)||data;write(result);return result;}
 module.exports={initializeStore,read,write,update};
