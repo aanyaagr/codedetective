@@ -73,6 +73,10 @@ export const NAV_LINKS = [
     label: "EVIDENCE TRAIL",
     href: "/evidence",
   },
+  {
+    label: "LEADERBOARD",
+    href: "/leaderboard",
+  },
 ];
 
 export const HERO_CASE_FILE = {
@@ -422,76 +426,21 @@ export const COMPARISON_REPORT = {
     label: "TRADITIONAL LEARNING",
     stamp: "OUTDATED",
     steps: [
-      { label: "WATCH", sub: "Passive video lectures", icon: "video" },
-      { label: "QUIZ", sub: "Multiple choice", icon: "file-text" },
+      { label: "WATCH", detail: "Lecture" },
+      { label: "READ", detail: "Notes" },
+      { label: "PRACTICE", detail: "Exercises" },
+      { label: "TEST", detail: "Exam" },
     ],
   },
   codedetective: {
     status: "STATUS: ACTIVE",
     label: "CODEDETECTIVE",
-    stamp: "VERIFIED",
+    stamp: "FIELD PROTOCOL",
     steps: [
-      { label: "INVESTIGATE", sub: "Examine bugs", icon: "search" },
-      { label: "CODE", sub: "Write logic", icon: "code" },
+      { label: "INVESTIGATE", detail: "Case" },
+      { label: "LEARN", detail: "Technique" },
+      { label: "CODE", detail: "Patch" },
+      { label: "PROVE", detail: "Evidence" },
     ],
   },
-};
-
-export const LEDGER_STATS = [
-  { label: "CASES SOLVED", value: "23", code: "REC-23", icon: "star", note: "Archived" },
-  { label: "XP BOUNTY", value: "12,450", code: "XP-12K", icon: "xp", note: "Experience" },
-];
-
-export const BADGE_RANKS = [
-  { id: "rookie", title: "ROOKIE", level: 1, stars: 1, metal: "iron", issuedDate: "LEVEL 01" },
-  { id: "chief-inspector", title: "CHIEF INSPECTOR", level: 5, stars: 5, metal: "gold", issuedDate: "ELITE", isMaster: true },
-];
-
-export const FINAL_CTA = {
-  stamp: "TOP SECRET // ACTIVE FILE",
-  headline: "ONE CASE IS STILL OPEN.",
-  subheadline: "YOUR FIRST INVESTIGATION AWAITS.",
-  supporting: "Open the file. Follow the evidence. Solve the mystery with real code.",
-  buttonText: "OPEN CASE →",
-  caseReference: "DOSSIER #001 // THE MISSING ALGORITHM",
-};
-
-export const FOOTER_DATA = {
-  brand: "CODEDETECTIVE",
-  subBrand: "ACADEMY",
-  precinct: "PRECINCT #404 INVESTIGATION BUREAU",
-  tagline: "Gamified Coding Investigation Platform. Learn to code. Follow the evidence. Solve the mystery.",
-  columns: [
-    {
-      title: "INVESTIGATION",
-      links: [
-        { label: "Case Board", href: "#case-board" },
-        { label: "Evidence Trail", href: "#evidence-trail" },
-        { label: "Gameplay Loop", href: "#gameplay-loop" },
-      ],
-    },
-    {
-      title: "PRECINCT LAB",
-      links: [
-        { label: "Live Code Lab", href: "#code-lab" },
-        { label: "Case Archives", href: "#" },
-      ],
-    },
-    {
-      title: "BUREAU",
-      links: [
-        { label: "Open Case File", href: "#get-started" },
-        { label: "Detective Ledger", href: "#" },
-      ],
-    },
-  ],
-  socials: [
-    { name: "Discord Wire", href: "https://discord.com" },
-    { name: "Twitter/X Dispatch", href: "https://twitter.com" },
-    { name: "GitHub Evidence", href: "https://github.com" },
-  ],
-  legal: [
-    { label: "Privacy Protocol", href: "#" },
-    { label: "Terms of Investigation", href: "#" },
-  ],
 };
