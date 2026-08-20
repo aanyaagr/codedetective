@@ -16,14 +16,17 @@ export type CaseSummary = {
   prerequisiteCaseId: string | null; stages: string[]; concept: string; locked: boolean;
   challenge: { id: string; language: string; starterCode: string; tests: Array<{ id: string; name: string; stdin?: string; hidden?: boolean }> };
 };
-
+export type Evidence = { id: string; code: string; text: string };
 export type RunResult = { status: string; stdout: string; stderr: string; testsPassed: number; testsTotal: number; score: number; passed: boolean };
+export type Progress = { xp: number; level: number; rank: string; streak: number; casesSolved: number; mastery: Record<string, unknown>; unlockedCaseIds: string[] };
 
 export const getCases = () => apiFetch<{ cases: CaseSummary[] }>("/cases");
-export const getCase = (id: string) => apiFetch<{ case: CaseSummary; progress: unknown; evidence: Array<{ id: string; code: string; text: string }> }>(`/cases/${id}`);
+export const getCase = (id: string) => apiFetch<{ case: CaseSummary; progress: { currentStage?: string; completedStages?: string[]; completed?: boolean } | null; evidence: Evidence[] }>(`/cases/${id}`);
+export const getCaseProgress = (id: string) => apiFetch<{ locked: boolean; progress: { currentStage?: string; completedStages?: string[]; completed?: boolean } | null; discoveredEvidence: Array<{ caseId: string; evidenceId: string; discoveredAt: string }> }>(`/cases/${id}/progress`);
+export const getProgress = () => apiFetch<Progress>("/progress");
 export const startCase = (id: string) => apiFetch<{ progress: unknown }>(`/cases/${id}/start`, { method: "POST" });
 export const updateStage = (id: string, stage: string) => apiFetch<{ progress: unknown }>(`/cases/${id}/stage`, { method: "POST", body: JSON.stringify({ stage }) });
-export const discoverEvidence = (id: string, evidenceId: string) => apiFetch<{ evidence: { id: string; code: string; text: string } }>(`/cases/${id}/evidence/${evidenceId}/discover`, { method: "POST" });
-export const completeCase = (id: string) => apiFetch<{ completed: boolean; xpAwarded: number; xp: number; rank: string; level: number; nextCaseUnlocked: string | null }>(`/cases/${id}/complete`, { method: "POST" });
+export const discoverEvidence = (id: string, evidenceId: string) => apiFetch<{ evidence: Evidence }>(`/cases/${id}/evidence/${evidenceId}/discover`, { method: "POST" });
+export const completeCase = (id: string) => apiFetch<{ completed: boolean; alreadyCompleted?: boolean; xpAwarded?: number; xp: number; rank: string; level: number; nextCaseUnlocked: string | null }>(`/cases/${id}/complete`, { method: "POST" });
 export const runCode = (challengeId: string, code: string) => apiFetch<RunResult>("/code/run", { method: "POST", body: JSON.stringify({ challengeId, code }) });
 export const submitCode = (challengeId: string, code: string) => apiFetch<RunResult & { submissionId: string }>("/code/submit", { method: "POST", body: JSON.stringify({ challengeId, code }) });
