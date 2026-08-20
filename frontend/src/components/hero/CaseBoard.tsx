@@ -17,6 +17,9 @@ import {
 export default function CaseBoard() {
   return (
     <section className="case-board">
+      <Link href="/" className="back-home-button">
+  ← BACK TO HQ
+</Link>
 
       {/* =========================================
           HEADER

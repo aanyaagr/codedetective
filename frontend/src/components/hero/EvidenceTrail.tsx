@@ -78,10 +78,10 @@ export default function EvidenceTrail() {
 
       <section className="evidence-header">
 
-        <button className="back-case-button">
-          <ArrowLeft size={16} />
-          BACK TO CASE BOARD
-        </button>
+        <Link href="/case-board" className="back-case-button">
+  <ArrowLeft size={16} />
+  BACK TO CASE BOARD
+</Link>
 
         <div className="evidence-heading">
 
