@@ -17,7 +17,7 @@ export type Resolution = { rootCause: string; fixSummary: string; beforeCode: st
 export type ChallengeTest = { id: string; name: string; stdin?: string; hidden?: boolean };
 export type Challenge = { id: string; language: string; starterCode: string; hint: string; tests: ChallengeTest[] };
 export type CaseSummary = {
-  id: string; number: string; title: string; description: string; objective: string; difficulty: string; xpReward: number;
+  id: string; seasonId: string; number: string; title: string; description: string; objective: string; difficulty: string; xpReward: number;
   prerequisiteCaseId: string | null; stages: string[]; concept: string; locked: boolean; lesson: Lesson; challenge: Challenge; resolution: Resolution;
 };
 export type Evidence = { id: string; code: string; text: string };
@@ -69,7 +69,7 @@ function toCodeLabCase(caseData: CaseSummary): CodeLabCase {
     id: caseData.id,
     caseNumber: Number(caseData.number),
     title: caseData.title,
-    course: caseData.seasonId || "",
+    course: caseData.seasonId,
     topic: caseData.concept,
     difficulty: caseData.difficulty,
     codingChallenge: {
