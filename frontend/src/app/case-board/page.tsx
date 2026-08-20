@@ -1,5 +1,5 @@
-import CaseBoard from "@/components/hero/CaseBoard";
+import LiveCaseBoard from "@/components/hero/LiveCaseBoard";
 
 export default function CaseBoardPage() {
-  return <CaseBoard />;
+  return <LiveCaseBoard />;
 }
