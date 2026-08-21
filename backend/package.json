@@ -3,16 +3,13 @@
   "version": "1.0.0",
   "description": "CodeDetective Academy backend",
   "main": "src/app.js",
-  "scripts": {
-    "start": "node src/app.js",
-    "dev": "node --watch src/app.js",
-    "test": "node --test"
-  },
+  "scripts": {"start":"node src/app.js","dev":"node --watch src/app.js","test":"node --test"},
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@supabase/supabase-js": "^2.55.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1"
