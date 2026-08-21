@@ -1,7 +1,50 @@
-const express=require("express"),crypto=require("crypto");const {read,update}=require("../services/store");const {hashPassword,verifyPassword,signToken}=require("../services/auth");const {SECRET}=require("../middleware/auth");
-const router=express.Router();
-function publicUser(u){const p=read().progress.find(x=>x.userId===u.id)||{};return{id:u.id,name:u.name,email:u.email,xp:p.xp||0,rank:p.rank||"ROOKIE",level:p.level||1};}
-router.post("/register",(req,res)=>{const{name,email,password}=req.body||{};if(!name||!email||!password||String(password).length<6)return res.status(400).json({error:"Name, email and a password of at least 6 characters are required"});const normalized=String(email).trim().toLowerCase(),data=read();if(data.users.some(u=>u.email===normalized))return res.status(409).json({error:"Email already registered"});const user={id:crypto.randomUUID(),name:String(name).trim().slice(0,80),email:normalized,passwordHash:hashPassword(String(password)),createdAt:new Date().toISOString()};data.users.push(user);data.progress.push({userId:user.id,xp:0,level:1,rank:"ROOKIE",streak:0,casesSolved:0,mastery:{},completedLessons:[],completedStages:{},discoveredEvidence:[],unlockedCaseIds:["case-001"]});update(()=>data);res.status(201).json({token:signToken({sub:user.id,name:user.name},SECRET),user:publicUser(user)});});
-router.post("/login",(req,res)=>{const{email,password}=req.body||{},user=read().users.find(u=>u.email===String(email||"").trim().toLowerCase());if(!user||!verifyPassword(String(password||""),user.passwordHash))return res.status(401).json({error:"Invalid email or password"});res.json({token:signToken({sub:user.id,name:user.name},SECRET),user:publicUser(user)});});
-router.get("/me",(req,res)=>{const h=req.headers.authorization||"",token=h.startsWith("Bearer ")?h.slice(7):null;const{verifyToken}=require("../services/auth"),p=verifyToken(token,SECRET),user=p&&read().users.find(u=>u.id===p.sub);if(!user)return res.status(401).json({error:"Authentication required"});res.json({user:publicUser(user)});});
-router.post("/logout",(req,res)=>res.json({success:true}));module.exports=router;
+const express = require("express");
+const crypto = require("crypto");
+const { query, insert } = require("../services/db");
+const { hashPassword, verifyPassword, signToken } = require("../services/auth");
+const { SECRET } = require("../middleware/auth");
+
+const router = express.Router();
+
+async function publicUser(user) {
+  const rows = await query("progress", { filters: { user_id: user.id }, limit: 1 });
+  const p = rows[0] || {};
+  return { id: user.id, name: user.name, email: user.email, xp: p.xp || 0, rank: p.rank || "ROOKIE", level: p.level || 1 };
+}
+
+router.post("/register", async (req, res, next) => {
+  try {
+    const { name, email, password } = req.body || {};
+    if (!name || !email || !password || String(password).length < 6) return res.status(400).json({ error: "Name, email and a password of at least 6 characters are required" });
+    const normalized = String(email).trim().toLowerCase();
+    if ((await query("users", { filters: { email: normalized }, limit: 1 })).length) return res.status(409).json({ error: "Email already registered" });
+    const user = await insert("users", { id: crypto.randomUUID(), name: String(name).trim().slice(0, 80), email: normalized, password_hash: hashPassword(String(password)) });
+    await insert("progress", { user_id: user.id, xp: 0, level: 1, rank: "ROOKIE", streak: 0, cases_solved: 0, mastery: {}, completed_lessons: [], completed_stages: {}, discovered_evidence: [], unlocked_case_ids: ["case-001"] });
+    res.status(201).json({ token: signToken({ sub: user.id, name: user.name }, SECRET), user: await publicUser(user) });
+  } catch (e) { next(e); }
+});
+
+router.post("/login", async (req, res, next) => {
+  try {
+    const { email, password } = req.body || {};
+    const rows = await query("users", { filters: { email: String(email || "").trim().toLowerCase() }, limit: 1 });
+    const user = rows[0];
+    if (!user || !verifyPassword(String(password || ""), user.password_hash)) return res.status(401).json({ error: "Invalid email or password" });
+    res.json({ token: signToken({ sub: user.id, name: user.name }, SECRET), user: await publicUser(user) });
+  } catch (e) { next(e); }
+});
+
+router.get("/me", async (req, res, next) => {
+  try {
+    const h = req.headers.authorization || "";
+    const token = h.startsWith("Bearer ") ? h.slice(7) : null;
+    const { verifyToken } = require("../services/auth");
+    const p = verifyToken(token, SECRET);
+    const user = p && (await query("users", { filters: { id: p.sub }, limit: 1 }))[0];
+    if (!user) return res.status(401).json({ error: "Authentication required" });
+    res.json({ user: await publicUser(user) });
+  } catch (e) { next(e); }
+});
+
+router.post("/logout", (req, res) => res.json({ success: true }));
+module.exports = router;
