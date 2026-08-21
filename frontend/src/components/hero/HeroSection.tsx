@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight, FolderOpen, Play } from "lucide-react";
 
 export default function HeroSection() {
@@ -31,11 +32,11 @@ export default function HeroSection() {
 
           <div className="hero-actions">
 
-            <button className="primary-button">
+            <Link href="/case-board" className="primary-button">
               <FolderOpen size={18} />
               OPEN CASE FILE
               <ArrowRight size={18} />
-            </button>
+            </Link>
 
             <button className="secondary-button">
               <Play size={17} />
