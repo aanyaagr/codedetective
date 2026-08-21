@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import "./readability.css";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 
 const plexSans = IBM_Plex_Sans({
