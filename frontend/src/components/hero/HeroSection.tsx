@@ -4,6 +4,13 @@ import Link from "next/link";
 import { ArrowRight, FolderOpen, Play } from "lucide-react";
 
 export default function HeroSection() {
+  const handleHowItWorks = () => {
+    document.getElementById("gameplay-loop")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   return (
     <section className="hero">
 
@@ -38,7 +45,11 @@ export default function HeroSection() {
               <ArrowRight size={18} />
             </Link>
 
-            <button className="secondary-button">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={handleHowItWorks}
+            >
               <Play size={17} />
               HOW IT WORKS
             </button>
