@@ -1,0 +1,78 @@
+/* =========================================================
+   CODE DETECTIVE — SMALL TEXT READABILITY PASS
+   Keeps display/code typography intact while making supporting
+   information easier to read at normal viewing distances.
+   ========================================================= */
+
+@layer components {
+  /* Tiny labels should never become difficult to scan. */
+  small,
+  [class~="text-[8px]"],
+  [class~="text-[9px]"],
+  [class~="text-[10px]"] {
+    font-family: var(--font-plex-sans), sans-serif !important;
+    font-size: 0.75rem !important;
+    line-height: 1.45 !important;
+    letter-spacing: 0.025em;
+  }
+
+  /* Evidence Trail — supporting text uses Plex Sans for clarity. */
+  .evidence-page .evidence-casebar,
+  .evidence-page .back-case-button,
+  .evidence-page .progress-list,
+  .evidence-page .objective-panel p,
+  .evidence-page .selected-content span,
+  .evidence-page .selected-content p,
+  .evidence-page .inventory-card,
+  .evidence-page .connect-info p,
+  .evidence-page .evidence-panel[role="status"] {
+    font-family: var(--font-plex-sans), sans-serif;
+  }
+
+  .evidence-page .progress-list {
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  .evidence-page .progress-list > div {
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .evidence-page .progress-list strong {
+    font-family: var(--font-plex-sans), sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-left: auto;
+  }
+
+  .evidence-page .objective-panel p,
+  .evidence-page .selected-content p {
+    font-size: 0.875rem;
+    line-height: 1.7;
+  }
+
+  .evidence-page .selected-content span {
+    display: block;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .evidence-page .evidence-casebar,
+  .evidence-page .back-case-button {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .evidence-page .connect-info p {
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  .evidence-page .inventory-card {
+    font-size: 0.8rem;
+  }
+}
