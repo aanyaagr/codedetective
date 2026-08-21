@@ -15,6 +15,7 @@ export function LiveCodeLabSection() {
   const [error, setError] = useState("");
   const [mounted, setMounted] = useState(false);
   const gutterRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -28,6 +29,16 @@ export function LiveCodeLabSection() {
       .then(({ case: data }) => {
         setCaseData(data);
         setCode(data.challenge.starterCode);
+
+        // Always open a fresh challenge at the beginning of the code,
+        // never at a horizontally scrolled position retained by the browser.
+        requestAnimationFrame(() => {
+          if (editorRef.current) {
+            editorRef.current.scrollLeft = 0;
+            editorRef.current.scrollTop = 0;
+          }
+          if (gutterRef.current) gutterRef.current.scrollTop = 0;
+        });
       })
       .catch((e) => setError(e instanceof Error ? e.message : "Unable to load case"))
       .finally(() => setLoading(false));
@@ -131,14 +142,15 @@ export function LiveCodeLabSection() {
                 </div>
 
                 <textarea
+                  ref={editorRef}
                   value={code}
                   onChange={(event) => setCode(event.target.value)}
                   onScroll={handleEditorScroll}
                   onKeyDown={handleEditorKeyDown}
                   spellCheck={false}
                   aria-label="Code editor"
-                  className="min-w-0 flex-1 h-full resize-none overflow-auto border-0 bg-transparent px-5 py-5 text-[13px] leading-6 text-slate-100 outline-none font-mono whitespace-pre"
-                  style={{ tabSize: 4 }}
+                  className="min-w-0 flex-1 h-full resize-none overflow-auto border-0 bg-transparent pl-5 pr-5 py-5 text-[13px] leading-6 text-slate-100 outline-none font-mono whitespace-pre"
+                  style={{ tabSize: 4, textIndent: 0 }}
                 />
               </div>
 
