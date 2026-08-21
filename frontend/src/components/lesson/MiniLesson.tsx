@@ -2,10 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, BookOpen, Lock, Lightbulb } from "lucide-react";
 import { completeLesson, getActiveCase, type CaseSummary } from "@/lib/api";
 
 export default function MiniLesson() {
+  const router = useRouter();
   const [caseData, setCaseData] = useState<CaseSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
@@ -20,8 +22,21 @@ export default function MiniLesson() {
 
   async function finishLesson() {
     if (!caseData) return;
-    try { await completeLesson(caseData.id); setCompleted(true); }
-    catch (err) { setError(err instanceof Error ? err.message : "Unable to save lesson progress."); }
+
+    // If the lesson was already completed, continue directly to the exercise.
+    if (completed) {
+      router.push("/exercise");
+      return;
+    }
+
+    try {
+      // Keep the existing backend progress update unchanged.
+      await completeLesson(caseData.id);
+      setCompleted(true);
+      router.push("/exercise");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to save lesson progress.");
+    }
   }
 
   if (loading) return <main className="lesson-page"><section className="lesson-content"><div className="lesson-label">MINI LESSON</div><h1 className="lesson-title">LOADING CASE CONCEPT...</h1></section></main>;
