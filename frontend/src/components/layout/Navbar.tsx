@@ -27,7 +27,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-red-950/60 bg-[#07080C]/95 shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl">
-      <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-2 sm:px-4 lg:px-6">
+      <div className="mx-auto flex h-[76px] w-full items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand */}
         <Link href="/" className="group flex shrink-0 items-center gap-3" onClick={closeMobile}>
           <div className="relative flex items-center justify-center rounded-lg p-1 transition-transform duration-200 group-hover:scale-105">
