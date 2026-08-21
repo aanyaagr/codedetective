@@ -29,22 +29,28 @@
     font-family: var(--font-plex-sans), sans-serif;
   }
 
+  /* Investigation Progress: deliberately larger than the old 14px size. */
   .evidence-page .progress-list {
-    font-size: 0.875rem;
-    line-height: 1.55;
+    font-family: var(--font-plex-sans), sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
   }
 
   .evidence-page .progress-list > div {
-    min-height: 2rem;
+    min-height: 2.25rem;
     display: flex;
     align-items: center;
-    gap: 0.55rem;
+    gap: 0.7rem;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
   }
 
   .evidence-page .progress-list strong {
     font-family: var(--font-plex-sans), sans-serif;
-    font-size: 0.875rem;
-    font-weight: 600;
+    font-size: 1.05rem;
+    line-height: 1.4;
+    font-weight: 700;
     margin-left: auto;
   }
 
