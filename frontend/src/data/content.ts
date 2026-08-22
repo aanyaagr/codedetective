@@ -444,3 +444,13 @@ export const COMPARISON_REPORT = {
     ],
   },
 };
+
+
+export const FINAL_CTA = {
+  stamp: "TOP SECRET // ACTIVE FILE",
+  headline: "ONE CASE IS STILL OPEN.",
+  subheadline: "YOUR FIRST INVESTIGATION AWAITS.",
+  supporting: "Open the file. Follow the evidence. Solve the mystery with real code.",
+  buttonText: "OPEN CASE →",
+  caseReference: "DOSSIER #001 // THE MISSING ALGORITHM",
+};
