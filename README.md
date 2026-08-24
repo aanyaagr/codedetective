@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CodeDetective Academy
 
-## Getting Started
+Full-stack detective-style coding learning platform built with Next.js and an Express backend.
 
-First, run the development server:
+## Architecture
+
+The frontend communicates with the authenticated Express API through the typed client in `frontend/src/lib/api.ts`. The backend owns authentication, case data, progression, evidence, submissions, XP, unlocking, and code execution.
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the complete workflow, API contract, data ownership, progression model, and local development architecture.
+
+## Local development
+
+### Backend
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd backend
+npm install
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Default API: `http://localhost:5001/api`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Frontend
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## Learn More
+If port 3000 is occupied, Next.js may start on another port such as `3001`. Configure the backend URL with `NEXT_PUBLIC_API_URL` when required.
 
-To learn more about Next.js, take a look at the following resources:
+## Core workflow
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```text
+Browser
+  -> Next.js frontend
+  -> typed API client
+  -> Express API + JWT
+  -> case/progress/code services
+  -> persistence / code execution
+  -> JSON response
+  -> frontend state and UI
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The frontend should not hardcode dynamic case values or determine whether submitted code is correct. Those decisions belong to the backend.
