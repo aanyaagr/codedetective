@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://code-detective-1.onrender.com/";
 
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = typeof window !== "undefined" ? localStorage.getItem("codedetective_token") : null;
