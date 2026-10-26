@@ -1,8 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight, FolderOpen, Play } from "lucide-react";
 
 export default function HeroSection() {
+  const handleHowItWorks = () => {
+    document.getElementById("gameplay-loop")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   return (
     <section className="hero">
 
@@ -31,13 +39,17 @@ export default function HeroSection() {
 
           <div className="hero-actions">
 
-            <button className="primary-button">
+            <Link href="/case-board" className="primary-button">
               <FolderOpen size={18} />
               OPEN CASE FILE
               <ArrowRight size={18} />
-            </button>
+            </Link>
 
-            <button className="secondary-button">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={handleHowItWorks}
+            >
               <Play size={17} />
               HOW IT WORKS
             </button>
