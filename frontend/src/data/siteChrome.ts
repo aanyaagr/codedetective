@@ -4,7 +4,7 @@ export const FINAL_CTA = {
   subheadline: "YOUR FIRST INVESTIGATION AWAITS.",
   supporting: "Open the file. Follow the evidence. Solve the mystery with real code.",
   buttonText: "OPEN CASE →",
-  caseReference: "DOSSIER #001 // THE MISSING ALGORITHM",
+  caseReference: "DOSSIER #001 // THE DUPLICATE REPORTS",
 };
 
 export const FOOTER_DATA = {

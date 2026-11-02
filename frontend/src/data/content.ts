@@ -82,7 +82,7 @@ export const NAV_LINKS = [
 export const HERO_CASE_FILE = {
   headerBadge: "CONFIDENTIAL // EYES ONLY",
   fileNumber: "CASE FILE #001",
-  caseTitle: "THE MISSING ALGORITHM",
+  caseTitle: "THE DUPLICATE REPORTS",
   status: "UNSOLVED",
   difficulty: "MEDIUM",
   evidenceCount: "03",
@@ -444,3 +444,14 @@ export const COMPARISON_REPORT = {
     ],
   },
 };
+
+// Used by sections/StatsAndJourney.tsx
+export const LEDGER_STATS = [
+  { label: "CASES SOLVED", value: "23", code: "REC-23", icon: "star", note: "Archived" },
+  { label: "XP BOUNTY", value: "12,450", code: "XP-12K", icon: "xp", note: "Experience" },
+];
+
+export const BADGE_RANKS = [
+  { id: "rookie", title: "ROOKIE", level: 1, stars: 1, metal: "iron", issuedDate: "LEVEL 01" },
+  { id: "chief-inspector", title: "CHIEF INSPECTOR", level: 5, stars: 5, metal: "gold", issuedDate: "ELITE", isMaster: true },
+];

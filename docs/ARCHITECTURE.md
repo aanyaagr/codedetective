@@ -19,6 +19,7 @@ Backend (Express / Node.js :5001)
   +--> Case Router
   +--> Progress Router
   +--> Code Router
+  +--> Assistant Router
   |
   +--> Store / persistence
   +--> Progression service
@@ -74,7 +75,7 @@ It provides typed functions for:
 - Code submission.
 - Overall player progress.
 
-The API base URL is configured with `NEXT_PUBLIC_API_URL` and defaults to `http://localhost:5001/api` for local development.
+The API base URL is configured with `NEXT_PUBLIC_API_URL` (with or without `/api`) and defaults to `http://localhost:5001/api` for local development.
 
 Authentication is attached as:
 
@@ -144,6 +145,18 @@ Handles:
 
 Provides authenticated player progression such as XP, level, rank, streak, solved cases, mastery, and unlocked cases.
 
+`GET /progress/leaderboard?limit=N` ranks every detective by XP, then cases solved, then evidence found, then who
+solved first. Equal records share a position; detectives with no activity are listed last; `me` always contains the
+caller's own row, even outside the top N.
+
+#### `/api/assistant`
+
+Protected by authentication.
+
+- `POST /assistant/:caseId/hint` — the next progressive hint (gentle first, explicit last); usage is stored per case.
+- `POST /assistant/:caseId/ask` — free-form question about the player's code. Uses Claude when `ANTHROPIC_API_KEY`
+  is set (instructed to guide, not to hand over the fix); otherwise answers from the case hints.
+
 ## 5. Code execution flow
 
 ```text
@@ -188,11 +201,18 @@ The important security/design boundary is that the frontend never decides whethe
 
 ## 6. Progression model
 
-A case has ordered stages such as:
+A case has ordered stages:
 
 ```text
 BRIEFING -> LEARN -> INVESTIGATE -> CODE -> EVIDENCE -> SOLVE
 ```
+
+Stages only move forward. Players can reach BRIEFING–CODE through normal play; EVIDENCE is granted by a passing
+submission and SOLVE by closing the case, so neither can be set directly through `/stage`.
+
+Evidence has a discovery condition: `investigate` (examined on the Evidence Trail), `failed_test` (uncovered by a
+failing run) or `passed_all_tests` (uncovered by a passing submission). Undiscovered evidence is returned with
+`text: null`.
 
 The backend stores the current stage and completed stages for each user/case.
 
@@ -217,7 +237,14 @@ The coding challenge is a prerequisite for final case completion. When the chall
 
 This separation is what prevents the production UI from silently falling back to hardcoded case values.
 
-## 8. Local development
+## 8. Persistence
+
+`backend/src/services/db.js` exposes `query / insert / update / remove / upsert`. With `SUPABASE_URL` and
+`SUPABASE_SERVICE_ROLE_KEY` set it talks to Supabase; otherwise it uses a local file store with the same tables
+(development only). Case content comes from `backend/src/data/cases.js` and is loaded with `npm run seed` or
+`supabase/seed.sql`.
+
+## 9. Local development
 
 Run the backend from `backend/`:
 
@@ -239,7 +266,7 @@ npm run dev
 
 The current local frontend can run on port `3001` if `3000` is already occupied. The frontend API client should continue targeting the backend at `http://localhost:5001/api` unless `NEXT_PUBLIC_API_URL` overrides it.
 
-## 9. Debugging checklist
+## 10. Debugging checklist
 
 If a page reports `Case not found`:
 
@@ -251,7 +278,7 @@ If a page reports `Case not found`:
 
 If a page shows a Next.js hydration warning involving `data-new-gr-c-s-check-loaded` or `data-gr-ext-installed`, those attributes are typically injected by a browser extension and are not application data. Test with extensions disabled/incognito before treating it as a React rendering defect.
 
-## 10. Current integration principle
+## 11. Current integration principle
 
 The target architecture is:
 

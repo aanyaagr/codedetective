@@ -11,6 +11,8 @@ export default function CaseReport() {
   const [progress, setProgress] = useState<Progress | null>(null);
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [discovered, setDiscovered] = useState(0);
+  const [lessonDone, setLessonDone] = useState(false);
+  const [caseClosed, setCaseClosed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -19,7 +21,7 @@ export default function CaseReport() {
       try {
         const active = await getActiveCase();
         const [caseProgress, overall] = await Promise.all([getCaseProgress(active.case.id), getProgress()]);
-        setCaseData(active.case); setEvidence(active.evidence); setSubmission(caseProgress.latestSubmission); setDiscovered(caseProgress.discoveredEvidence.length); setProgress(overall);
+        setCaseData(active.case); setEvidence(active.evidence); setSubmission(caseProgress.bestSubmission ?? caseProgress.latestSubmission); setDiscovered(caseProgress.discoveredEvidence.length); setProgress(overall); setLessonDone((caseProgress.progress?.completedStages || []).includes("LEARN")); setCaseClosed(caseProgress.progress?.completed === true);
       } catch (err) { setError(err instanceof Error ? err.message : "Unable to load case report."); }
       finally { setLoading(false); }
     })();
@@ -28,7 +30,8 @@ export default function CaseReport() {
   if (loading) return <main className="case-report-page"><section className="report-container"><h1>LOADING CASE REPORT...</h1></section></main>;
   if (!caseData) return <main className="case-report-page"><section className="report-container"><h1>CASE REPORT UNAVAILABLE</h1><p>{error}</p></section></main>;
 
-  const solved = submission?.passed === true;
+  const solved = caseClosed || submission?.passed === true;
+  const resolution = caseData.resolution || ({} as typeof caseData.resolution);
   const tests = submission ? `${submission.testsPassed} / ${submission.testsTotal}` : "—";
 
   return (
@@ -38,11 +41,11 @@ export default function CaseReport() {
         <div className="report-heading"><div><div className="report-kicker">CASE REPORT</div><div className="case-number">CASE #{caseData.number}</div><h1>{caseData.title}</h1><p>{caseData.description}</p></div><div className="solved-badge"><div className="solved-icon"><Check size={20} /></div><div><small>CASE STATUS</small><strong>{solved ? "SOLVED" : "IN PROGRESS"}</strong></div></div></div>
         <div className="report-grid">
           <section className="report-card summary-card"><ReportTitle icon="≡" title="CASE SUMMARY" /><div className="summary-content"><p>{caseData.objective}</p><div className="fingerprint"><div className="fingerprint-inner">◉</div></div></div></section>
-          <section className="report-card"><ReportTitle icon="▥" title="PERFORMANCE OVERVIEW" /><div className="performance-list"><PerformanceRow icon="◉" label="Evidence Discovered" value={`${discovered} / ${evidence.length}`} /><PerformanceRow icon="◉" label="Mini Lesson" value="Backend tracked" green /><PerformanceRow icon="⌘" label="Exercise" value={submission ? "Submitted" : "Pending"} green={!!submission} /><PerformanceRow icon="✓" label="Code Lab" value={tests} green={solved} /></div></section>
-          <section className="report-card"><ReportTitle icon="⌕" title="ROOT CAUSE" /><h2 className="cause-title">{caseData.resolution.rootCause}</h2><p className="cause-description">{caseData.resolution.fixSummary}</p></section>
-          <section className="report-card"><ReportTitle icon="</>" title="YOUR FIX" /><div className="code-label">BEFORE</div><div className="code-box">{caseData.resolution.beforeCode}</div><div className="fix-arrow">↓</div><div className="code-label after">AFTER</div><div className="code-box fixed">{caseData.resolution.afterCode}</div><div className="tests-passed"><Check size={16} /><span>TESTS PASSED</span><strong>{tests}</strong></div></section>
+          <section className="report-card"><ReportTitle icon="▥" title="PERFORMANCE OVERVIEW" /><div className="performance-list"><PerformanceRow icon="◉" label="Evidence Discovered" value={`${discovered} / ${evidence.length}`} /><PerformanceRow icon="◉" label="Mini Lesson" value={lessonDone ? "Completed" : "Pending"} green={lessonDone} /><PerformanceRow icon="⌘" label="Exercise" value={submission ? "Submitted" : "Pending"} green={!!submission} /><PerformanceRow icon="✓" label="Code Lab" value={tests} green={solved} /></div></section>
+          <section className="report-card"><ReportTitle icon="⌕" title="ROOT CAUSE" /><h2 className="cause-title">{solved ? resolution.rootCause : "Classified until the case is solved."}</h2><p className="cause-description">{solved ? resolution.fixSummary : "Pass every test to unseal the investigator's report."}</p></section>
+          <section className="report-card"><ReportTitle icon="</>" title="YOUR FIX" /><div className="code-label">BEFORE</div><div className="code-box">{solved ? resolution.beforeCode : "—"}</div><div className="fix-arrow">↓</div><div className="code-label after">AFTER</div><div className="code-box is-fixed">{solved ? resolution.afterCode : "—"}</div><div className="tests-passed"><Check size={16} /><span>TESTS PASSED</span><strong>{tests}</strong></div></section>
           <section className="report-card test-card"><ReportTitle icon="⌬" title="TEST CASE RESULTS" /><div className="test-table"><div className="test-header"><span>Result</span><span>Passed</span><span>Total</span><span>Score</span></div><div className="test-row"><span>Latest submission</span><span>{submission?.testsPassed ?? 0}</span><span>{submission?.testsTotal ?? 0}</span><span>{submission?.score ?? 0}%</span></div></div></section>
-          <section className="report-card evidence-card"><ReportTitle icon="⌁" title="EVIDENCE CONNECTED" /><div className="evidence-grid">{evidence.map((item) => <div className="evidence-item" key={item.id}><div className="evidence-icon">✓</div><div className="evidence-check"><Check size={12} /></div><strong>{item.code}</strong><small>{item.text}</small></div>)}</div></section>
+          <section className="report-card evidence-card"><ReportTitle icon="⌁" title="EVIDENCE CONNECTED" /><div className="evidence-grid">{evidence.map((item) => <div className="evidence-item" key={item.id}><div className="evidence-icon">{item.discovered ? "✓" : "?"}</div>{item.discovered && <div className="evidence-check"><Check size={12} /></div>}<strong>{item.code}</strong><small>{item.text ?? "Sealed — not discovered yet"}</small></div>)}</div></section>
           <section className="report-card metrics-card"><ReportTitle icon="◎" title="INVESTIGATION METRICS" /><div className="metrics-grid"><Metric value={`${submission?.score ?? 0}%`} label="CODE SCORE" icon="☆" /><Metric value={`+${solved ? caseData.xpReward : 0} XP`} label="CASE REWARD" icon="◎" /><Metric value={`${discovered}`} label="EVIDENCE FOUND" icon="◷" /></div></section>
         </div>
         {error && <div className="report-card"><p>{error}</p></div>}

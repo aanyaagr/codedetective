@@ -12,17 +12,9 @@ import {
   Star,
   Trophy,
 } from "lucide-react";
-import { apiFetch } from "@/lib/api";
-
-type LeaderboardEntry = {
-  name: string;
-  xp: number;
-  rank: string;
-};
-
-type LeaderboardResponse = {
-  leaderboard: LeaderboardEntry[];
-};
+import { getLeaderboard, type LeaderboardEntry } from "@/lib/api";
+import { useAuthUser, useHydrated } from "@/lib/auth";
+import { SignInGate } from "@/components/ui/SignInGate";
 
 const RANK_STYLES = {
   1: "border-amber-500/60 bg-amber-500/[0.07]",
@@ -54,7 +46,7 @@ function PodiumCard({
     <article
       className={`relative overflow-hidden rounded-xl border p-5 ${
         RANK_STYLES[position]
-      }`}
+      } ${entry.isCurrentUser ? "ring-2 ring-red-500/70" : ""}`}
     >
       <div className="absolute right-4 top-4 text-[10px] font-mono font-black tracking-[0.2em] text-slate-500">
         #{position}
@@ -69,7 +61,9 @@ function PodiumCard({
       </p>
       <h2 className="truncate text-xl font-black uppercase tracking-wide text-[#F5F2ED]">
         {entry.name}
+        {entry.isCurrentUser && <span className="ml-2 rounded bg-red-600 px-1.5 py-0.5 align-middle font-mono text-[11px] tracking-wider text-white">YOU</span>}
       </h2>
+      <p className="mt-1 font-mono text-xs text-slate-400">{entry.casesSolved} {entry.casesSolved === 1 ? "case" : "cases"} solved · {entry.evidenceFound} evidence</p>
       <div className="mt-3 flex items-center gap-2 font-mono text-sm font-bold text-amber-300">
         <Star className="h-4 w-4 fill-current" />
         {formatXp(entry.xp)} XP
@@ -80,19 +74,21 @@ function PodiumCard({
 
 function LeaderboardRow({ entry }: { entry: LeaderboardEntry }) {
   return (
-    <div className="grid grid-cols-[56px_minmax(0,1fr)_120px_120px] items-center gap-4 border-t border-white/[0.07] px-5 py-4 first:border-t-0">
-      <span className="font-mono text-sm font-black text-slate-500">
-        #{entry.rank}
+    <div className={`grid grid-cols-[48px_minmax(0,1fr)_96px] sm:grid-cols-[56px_minmax(0,1fr)_120px_140px] items-center gap-3 sm:gap-4 border-t border-white/[0.07] px-4 sm:px-5 py-4 first:border-t-0 ${entry.isCurrentUser ? "bg-red-950/25 shadow-[inset_3px_0_0_#dc2626]" : ""} ${entry.xp === 0 ? "opacity-60" : ""}`}>
+      <span className="font-mono text-sm font-black text-slate-400">
+        #{entry.position}
       </span>
       <div className="min-w-0">
         <p className="truncate font-mono text-sm font-bold uppercase tracking-wide text-[#F5F2ED]">
           {entry.name}
+          {entry.isCurrentUser && <span className="ml-2 rounded bg-red-600 px-1.5 py-0.5 font-mono text-[11px] tracking-wider text-white">YOU</span>}
         </p>
+        <p className="mt-0.5 font-mono text-xs text-slate-500">{entry.casesSolved} solved · {entry.evidenceFound} evidence</p>
       </div>
       <span className="text-right font-mono text-sm font-bold text-amber-300">
         {formatXp(entry.xp)} XP
       </span>
-      <span className="text-right text-[10px] font-mono font-black uppercase tracking-[0.16em] text-slate-500">
+      <span className="hidden sm:block text-right text-xs font-mono font-black uppercase tracking-[0.12em] text-slate-400">
         {entry.rank}
       </span>
     </div>
@@ -100,34 +96,48 @@ function LeaderboardRow({ entry }: { entry: LeaderboardEntry }) {
 }
 
 export default function LeaderboardPage() {
+  const user = useAuthUser();
+  const hydrated = useHydrated();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [me, setMe] = useState<LeaderboardEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const loadLeaderboard = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await apiFetch<LeaderboardResponse>(
-        "/progress/leaderboard",
-      );
-
-      setEntries((response.leaderboard || []).slice(0, 15));
-    } catch (err) {
-      console.error("Failed to load leaderboard:", err);
-      setError("Unable to load the detective leaderboard.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [refreshToken, setRefreshToken] = useState(0);
+  const userId = user?.id ?? null;
 
   useEffect(() => {
-    loadLeaderboard();
-  }, []);
+    if (!userId) return;
+    let cancelled = false;
+    getLeaderboard(15)
+      .then((response) => {
+        if (cancelled) return;
+        setEntries(response.leaderboard || []);
+        setMe(response.me);
+        setError(null);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error("Failed to load leaderboard:", err);
+        setError(err instanceof Error ? err.message : "Unable to load the detective leaderboard.");
+      })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [userId, refreshToken]);
 
-  const podium = entries.slice(0, 3);
-  const remaining = entries.slice(3, 15);
+  const loadLeaderboard = () => { setLoading(true); setRefreshToken((t) => t + 1); };
+
+  // Only detectives with progress earn a podium spot.
+  const podium = entries.filter((e) => e.xp > 0).slice(0, 3);
+  const remaining = entries.filter((e) => !podium.includes(e));
+  const meOutside = me && !entries.some((e) => e.isCurrentUser) ? me : null;
+
+  if (hydrated && !user) {
+    return (
+      <main className="min-h-screen bg-[#07080C] text-slate-200 py-10">
+        <SignInGate title="SIGN IN TO SEE THE DETECTIVE LEADERBOARD" message="Rankings are built from every detective's verified XP, solved cases and evidence." />
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#07080C] text-slate-200">
@@ -156,7 +166,7 @@ export default function LeaderboardPage() {
           </button>
         </div>
 
-        {loading ? (
+        {!hydrated || loading ? (
           <section className="rounded-xl border border-white/[0.08] bg-[#0A0C11]/70 p-12 text-center">
             <Trophy className="mx-auto mb-4 h-8 w-8 animate-pulse text-amber-400" />
             <p className="font-mono text-sm uppercase tracking-[0.2em] text-slate-500">
@@ -192,25 +202,31 @@ export default function LeaderboardPage() {
             <section className="mb-8 grid gap-4 md:grid-cols-3">
               {podium.map((entry, index) => (
                 <PodiumCard
-                  key={`${entry.name}-${entry.rank}`}
+                  key={`${entry.position}-${entry.name}-${index}`}
                   entry={entry}
-                  position={(index + 1) as 1 | 2 | 3}
+                  position={Math.min(3, entry.position) as 1 | 2 | 3}
                 />
               ))}
             </section>
 
-            {remaining.length > 0 && (
+            {(remaining.length > 0 || meOutside) && (
               <section className="overflow-hidden rounded-xl border border-white/[0.08] bg-[#0A0C11]/70">
-                <div className="grid grid-cols-[56px_minmax(0,1fr)_120px_120px] gap-4 border-b border-red-950/50 bg-black/20 px-5 py-3 font-mono text-[10px] font-black uppercase tracking-[0.18em] text-slate-600">
-                  <span>RANK</span>
+                <div className="grid grid-cols-[48px_minmax(0,1fr)_96px] sm:grid-cols-[56px_minmax(0,1fr)_120px_140px] gap-3 sm:gap-4 border-b border-red-950/50 bg-black/20 px-4 sm:px-5 py-3 font-mono text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+                  <span>#</span>
                   <span>DETECTIVE</span>
                   <span className="text-right">XP</span>
-                  <span className="text-right">CLASS</span>
+                  <span className="hidden sm:block text-right">CLASS</span>
                 </div>
 
-                {remaining.map((entry) => (
-                  <LeaderboardRow key={`${entry.name}-${entry.rank}`} entry={entry} />
+                {remaining.map((entry, index) => (
+                  <LeaderboardRow key={`${entry.position}-${entry.name}-${index}`} entry={entry} />
                 ))}
+                {meOutside && (
+                  <>
+                    <div className="border-t border-white/[0.07] px-5 py-2 text-center font-mono text-slate-600">⋯</div>
+                    <LeaderboardRow entry={meOutside} />
+                  </>
+                )}
               </section>
             )}
           </>

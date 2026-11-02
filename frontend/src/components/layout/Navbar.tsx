@@ -2,25 +2,30 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { DetectiveLogoIcon } from "@/components/ui/Icons";
 import { Button } from "@/components/ui/Button";
 import { Menu, X, UserRound, ChevronDown, Trophy, LogOut, Shield } from "lucide-react";
-import { getStoredUser, logout, type User } from "@/lib/auth";
+import { logout, refreshUser, useAuthUser } from "@/lib/auth";
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const user = useAuthUser();
+  const userId = user?.id;
+  const pathname = usePathname();
+  const router = useRouter();
 
+  // Keep XP / rank current after solving cases (and across tabs).
   useEffect(() => {
-    setUser(getStoredUser());
-  }, []);
+    if (userId) refreshUser();
+  }, [userId, pathname]);
 
   const handleLogout = () => {
     logout();
-    setUser(null);
     setProfileOpen(false);
     setMobileMenuOpen(false);
+    router.push("/");
   };
 
   const closeMobile = () => setMobileMenuOpen(false);

@@ -1,15 +1,30 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { login, register } from "@/lib/auth";
 import { AlertTriangle, ArrowLeft, LockKeyhole, Mail, ShieldCheck, Terminal } from "lucide-react";
 import { DetectiveLogoIcon, RubberStamp } from "@/components/ui/Icons";
 
+// Only allow same-site redirects after signing in.
+function safeNext(value: string | null) {
+  return value && value.startsWith("/") && !value.startsWith("//") ? value : "/case-board";
+}
+
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const params = useSearchParams();
+  const next = safeNext(params.get("next"));
+  const [mode, setMode] = useState<"login" | "register">(params.get("mode") === "register" ? "register" : "login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,10 +38,9 @@ export default function LoginPage() {
     try {
       if (mode === "register") await register(name, email, password);
       else await login(email, password);
-      router.push("/case-board");
+      router.push(next);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Authentication failed");
-    } finally {
       setLoading(false);
     }
   }
@@ -137,6 +151,8 @@ export default function LoginPage() {
                         value={name}
                         onChange={e => setName(e.target.value)}
                         placeholder="ENTER YOUR DETECTIVE NAME"
+                        autoComplete="nickname"
+                        maxLength={40}
                         required
                         className="w-full rounded-sm border border-white/[0.09] bg-[#07090D] px-4 py-3.5 font-mono text-sm text-slate-100 placeholder:text-slate-700 outline-none transition focus:border-red-600/70 focus:ring-1 focus:ring-red-600/20"
                       />
@@ -152,6 +168,7 @@ export default function LoginPage() {
                       onChange={e => setEmail(e.target.value)}
                       type="email"
                       placeholder="ENTER REGISTERED EMAIL"
+                      autoComplete="email"
                       required
                       className="w-full rounded-sm border border-white/[0.09] bg-[#07090D] px-4 py-3.5 font-mono text-sm text-slate-100 placeholder:text-slate-700 outline-none transition focus:border-red-600/70 focus:ring-1 focus:ring-red-600/20"
                     />
@@ -166,6 +183,7 @@ export default function LoginPage() {
                       onChange={e => setPassword(e.target.value)}
                       type="password"
                       placeholder="ENTER PASSWORD"
+                      autoComplete={isLogin ? "current-password" : "new-password"}
                       minLength={6}
                       required
                       className="w-full rounded-sm border border-white/[0.09] bg-[#07090D] px-4 py-3.5 font-mono text-sm text-slate-100 placeholder:text-slate-700 outline-none transition focus:border-red-600/70 focus:ring-1 focus:ring-red-600/20"

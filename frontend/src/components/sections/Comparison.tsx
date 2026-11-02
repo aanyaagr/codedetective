@@ -27,9 +27,9 @@ export const Comparison: React.FC = () => {
             <h3 className="text-base font-black text-slate-300 font-mono uppercase mb-4">
               {COMPARISON_REPORT.traditional.label}
             </h3>
-            {COMPARISON_REPORT.traditional.steps.map((step: { label: string; sub: string; icon: string }, idx: number) => (
+            {COMPARISON_REPORT.traditional.steps.map((step: { label: string; detail: string }, idx: number) => (
               <div key={step.label} className="p-2.5 rounded bg-[#131720] border border-white/5 flex items-center justify-between font-mono text-xs">
-                <span>0{idx + 1}. {step.label} ({step.sub})</span>
+                <span>0{idx + 1}. {step.label} ({step.detail})</span>
               </div>
             ))}
           </div>
@@ -42,9 +42,9 @@ export const Comparison: React.FC = () => {
             <h3 className="text-base font-black text-amber-300 font-mono uppercase mb-4">
               {COMPARISON_REPORT.codedetective.label}
             </h3>
-            {COMPARISON_REPORT.codedetective.steps.map((step: { label: string; sub: string; icon: string }, idx: number) => (
+            {COMPARISON_REPORT.codedetective.steps.map((step: { label: string; detail: string }, idx: number) => (
               <div key={step.label} className="p-2.5 rounded bg-[#18130A] border border-amber-500/30 flex items-center justify-between font-mono text-xs text-amber-200">
-                <span>0{idx + 1}. {step.label} ({step.sub})</span>
+                <span>0{idx + 1}. {step.label} ({step.detail})</span>
               </div>
             ))}
           </div>

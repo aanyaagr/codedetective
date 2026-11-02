@@ -63,7 +63,7 @@ export default function HeroSection() {
             </div>
 
             <div className="dossier-title">
-              THE MISSING ALGORITHM
+              THE DUPLICATE REPORTS
               <span className="dossier-status">
                 <span className="status-dot" />
                 UNSOLVED
